@@ -6,6 +6,10 @@ from . import crud, models, schemas
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from fastapi.exceptions import HTTPException
+from .utils import create_access_token, verify_access_token
+from .config import ACCESS_TOKEN_EXPIRE_MINUTES
+from datetime import timedelta
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -27,8 +31,23 @@ def login(
     db: Session = Depends(get_db),
 ):
     user = crud.get_user_by_email(db, credentials.username)
-    print(user)
-    return {"message": "Message"}
+    if not user:
+        raise HTTPException(status_code=403, detail="Invalid email or password")
+    if str(user.password) != str(credentials.password):
+        raise HTTPException(status_code=403, detail="Invalid email or password")
+
+    token = create_access_token(
+        {"sub": str(user.id)}, expires_delta=timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+
+    return {"access_token": token}
+
+@app.post("/verify")
+def verify_token(token: schemas.Token):
+    data = verify_access_token(token.access_token)
+    if not data:
+        return HTTPException(status_code=403, detail="Token failed verification")
+    return data
 
 
 @app.post("/create", response_model=schemas.UserSchema)
