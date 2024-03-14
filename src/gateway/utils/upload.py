@@ -5,7 +5,7 @@ import hashlib
 import os
 
 
-client = MongoClient(os.environ.get("MONGO_URI"))
+client = MongoClient("mongodb://root:example@localhost:27017/file_db?authSource=admin")
 video_db = client.get_database('video_database')
 fs = GridFS(video_db)
 
@@ -18,18 +18,18 @@ def calculate_hash(content):
 
 def upload_file(file):
     try:
-        file_id = fs.put(file, filename=file.filename)    
+        file_id = fs.put(file.file.read(), filename=file.filename)    
     except Exception as err:
-        return None, err
-    
+        return None, str(err)
+        
     try:
         producer = Producer("video_topic")
         producer.emit_event({
-            "video_id": file_id
+            "video_id": str(file_id)
         })
     except Exception as err:
         fs.delete(file_id)
-        return None, err
-    
-    return file_id, None
+        return None, str(err)
+        
+    return str(file_id), None
     

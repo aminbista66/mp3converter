@@ -20,7 +20,6 @@ def verify_token(token: str):
     res = requests.post(
         url, json={"access_token": token}
     )
-    print(res)
     if res.status_code != 200:
         return False, res.text
     

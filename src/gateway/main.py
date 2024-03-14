@@ -31,7 +31,7 @@ def convert(req: Request, file: UploadFile | None = None):
 
     if err:
         raise HTTPException(detail=err, status_code=403)
-    
+
     if not verified:
         raise HTTPException(detail="Invalid credentials", status_code=403)
     
