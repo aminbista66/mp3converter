@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Response
 from .config import load_env
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
@@ -25,8 +25,8 @@ def get_db():
         db.close()
 
 
-@app.post("/login")
-def login(
+@app.post("/get-token")
+def get_token(
     credentials: Annotated[HTTPBasicCredentials, Depends(security)],
     db: Session = Depends(get_db),
 ):
@@ -40,9 +40,9 @@ def login(
         {"sub": str(user.id)}, expires_delta=timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
-    return {"access_token": token}
+    return {"access_token": token} 
 
-@app.post("/verify")
+@app.post("/verify-token")
 def verify_token(token: schemas.Token):
     data = verify_access_token(token.access_token)
     if not data:
@@ -50,7 +50,7 @@ def verify_token(token: schemas.Token):
     return data
 
 
-@app.post("/create", response_model=schemas.UserSchema)
+@app.post("/create-user", response_model=schemas.UserSchema)
 def create_user(user: schemas.UserSchema, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, user.email)
     if db_user:
