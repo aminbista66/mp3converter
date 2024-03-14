@@ -46,7 +46,7 @@ def get_token(
 def verify_token(token: schemas.Token):
     data = verify_access_token(token.access_token)
     if not data:
-        return HTTPException(status_code=403, detail="Token failed verification")
+        raise HTTPException(status_code=403, detail="Token failed verification")
     return data
 
 
