@@ -3,11 +3,13 @@ from gridfs import GridFS
 from .producer import Producer
 import hashlib
 import os
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 
-client = MongoClient("mongodb://root:example@localhost:27017/file_db?authSource=admin")
+client = MongoClient(os.environ.get("MONGO_URI"))
 video_db = client.get_database('video_database')
-fs = GridFS(video_db)
+fs_videos = GridFS(video_db)
 
 
 def calculate_hash(content):
@@ -18,17 +20,17 @@ def calculate_hash(content):
 
 def upload_file(file):
     try:
-        file_id = fs.put(file.file.read(), filename=file.filename)    
+        file_id = fs_videos.put(file.file.read(), filename=file.filename)    
     except Exception as err:
         return None, str(err)
-        
+            
     try:
         producer = Producer("video_topic")
         producer.emit_event({
             "video_id": str(file_id)
         })
     except Exception as err:
-        fs.delete(file_id)
+        fs_videos.delete(file_id)
         return None, str(err)
         
     return str(file_id), None

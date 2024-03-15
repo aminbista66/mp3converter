@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Response
+from fastapi import FastAPI, Depends, Request
 from .config import load_env
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
@@ -40,7 +40,7 @@ def get_token(
         {"sub": str(user.id)}, expires_delta=timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
-    return {"access_token": token} 
+    return {"access_token": token}
 
 @app.post("/verify-token")
 def verify_token(token: schemas.Token):
@@ -58,3 +58,14 @@ def create_user(user: schemas.UserSchema, db: Session = Depends(get_db)):
             status_code=403, detail="User with this email already exists"
         )
     return crud.create_user(db, user)
+
+
+@app.get("/user-email/{user_id}/")
+def get_user_mail(req: Request, db: Session = Depends(get_db)):
+    token = req.headers["Authorization"]
+    data = verify_access_token(token)
+    if not data:
+        raise HTTPException(status_code=403, detail="Token failed verification")
+
+    user = crud.get_user(db, data["sub"])
+    return {"email": user.email} if user else {"detail": "User not found"}

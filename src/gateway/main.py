@@ -1,14 +1,30 @@
-from fastapi import FastAPI, Depends, UploadFile, Request
+from fastapi import FastAPI, Depends, UploadFile, Request, File
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
 from .auth_svc import access
 from fastapi.exceptions import HTTPException
 from .config import load_env
 from .utils import upload
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(on_startup=[load_env])
 security = HTTPBasic()
 
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:5173/",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/login")
 def login(
@@ -22,7 +38,6 @@ def login(
 
 @app.post("/convert")
 def convert(req: Request, file: UploadFile | None = None):
-
     if not file:
         return {"message": "No file uploded"}
 
