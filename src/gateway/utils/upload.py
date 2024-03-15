@@ -18,7 +18,7 @@ def calculate_hash(content):
     return md5.hexdigest()
 
 
-def upload_file(file):
+def upload_file(file, user):
     try:
         file_id = fs_videos.put(file.file.read(), filename=file.filename)    
     except Exception as err:
@@ -27,7 +27,8 @@ def upload_file(file):
     try:
         producer = Producer("video_topic")
         producer.emit_event({
-            "video_id": str(file_id)
+            "video_id": str(file_id),
+            "user": user
         })
     except Exception as err:
         fs_videos.delete(file_id)

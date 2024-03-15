@@ -50,7 +50,12 @@ def convert(req: Request, file: UploadFile | None = None):
     if not verified:
         raise HTTPException(detail="Invalid credentials", status_code=403)
     
-    file_id, err = upload.upload_file(file)
+    user, err = access.get_email(token)
+
+    if err:
+        raise HTTPException(detail=err, status_code=403)
+    
+    file_id, err = upload.upload_file(file, user)
     
     if err:
         raise HTTPException(detail=err, status_code=403)
