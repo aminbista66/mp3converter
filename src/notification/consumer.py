@@ -2,16 +2,14 @@ from confluent_kafka import Consumer, Message
 import os
 from confluent_kafka.error import KafkaError, KafkaException
 import sys
-from convert import to_mp3
+import send
 
-
-
-class VideoConsumer:
+class MP3Consumer:
     consumer: Consumer
     topics: list[str]
 
     def __init__(self) -> None:
-        self.topics = ["video_topic"]
+        self.topics = ["mp3_topic"]
 
         self.consumer = Consumer(
             {
@@ -26,7 +24,7 @@ class VideoConsumer:
             }
         )
 
-    def run(self, fs_videos, fs_mp3s):
+    def run(self):
         try:
             print(self.topics)
             self.consumer.subscribe(topics=self.topics)
@@ -54,7 +52,7 @@ class VideoConsumer:
                             key=msg.key().decode("utf-8"),  # type:ignore
                         )
                     )
-                    to_mp3.start(msg.value(), fs_videos, fs_mp3s)
+                    send.notification(msg.value())
 
         except KeyboardInterrupt:
             print("exitting...")

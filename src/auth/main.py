@@ -60,9 +60,9 @@ def create_user(user: schemas.UserSchema, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
 
 
-@app.get("/user-email/{user_id}/")
+@app.get("/user-email")
 def get_user_mail(req: Request, db: Session = Depends(get_db)):
-    token = req.headers["Authorization"]
+    token = req.headers["Authorization"].split(" ")[1]
     data = verify_access_token(token)
     if not data:
         raise HTTPException(status_code=403, detail="Token failed verification")

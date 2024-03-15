@@ -34,7 +34,8 @@ def start(message, fs_videos: GridFS, fs_mp3s: GridFS):
     try:
         producer = Producer("mp3_topic")
         producer.emit_event({
-            "mp3_id": str(fid)
+            "mp3_id": str(fid),
+            "user": message.get("user")
         })
     except Exception as err:
         fs_mp3s.delete(fid)
