@@ -67,10 +67,10 @@ def convert(req: Request, file: UploadFile | None = None):
     return {"file_id": file_id}
 
 
-@app.get("download/{mp3_id}")
+@app.get("/download/{mp3_id}")
 def download_mp3(mp3_id: str):
     # Set response headers to stream the file
-    headers = {"Content-Disposition": f"attachment; filename="}
+    headers = {"Content-Disposition": f"attachment; filename={mp3_id}.mp3"}
     return StreamingResponse(
         download.stream_file(mp3_id), media_type="audio/mpeg", headers=headers
     )

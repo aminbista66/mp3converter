@@ -20,7 +20,11 @@ def notification(message):
         return
 
     msg = EmailMessage()
-    msg.set_content(f"mp3 file_id: {mp3_fid} is now ready!")
+    msg.set_content(
+        "mp3 file is now ready. download url: "
+        + os.environ.get("GATEWAY_URL", "")
+        + os.environ.get("DOWNLOAD_ENDPOINT", "").format(mp3_fid)
+    )
     msg["Subject"] = "MP3 Download"
     msg["To"] = receiver_address
 
