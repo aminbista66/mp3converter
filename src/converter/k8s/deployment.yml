@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: converter-deployment
+  labels:
+    app: converter
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: converter
+  template:
+    metadata:
+      labels:
+        app: converter
+    spec:
+      containers:
+      - name: converter-backend
+        resources: {}
+        image: "<image url>"
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: converter-secret

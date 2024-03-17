@@ -12,13 +12,6 @@ from fastapi.responses import StreamingResponse
 app = FastAPI(on_startup=[load_env])
 security = HTTPBasic()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:5173/",
-]
 
 app.add_middleware(
     CORSMiddleware,
