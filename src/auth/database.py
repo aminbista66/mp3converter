@@ -1,9 +1,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv, find_dotenv
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./auth_db.db"
+load_dotenv(find_dotenv())
+
+# SQLALCHEMY_DATABASE_URL = "sqlite:///./auth_db.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not SQLALCHEMY_DATABASE_URL:
+    raise Exception("set DATABASE_URL in your environment")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
