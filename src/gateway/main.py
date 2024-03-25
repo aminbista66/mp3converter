@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, UploadFile, Request, File
+from fastapi import FastAPI, Depends, UploadFile, Request, File, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
 from .auth_svc import access
@@ -67,3 +67,8 @@ def download_mp3(mp3_id: str):
     return StreamingResponse(
         download.stream_file(mp3_id), media_type="audio/mpeg", headers=headers
     )
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health():
+    return {"status": "ok"}

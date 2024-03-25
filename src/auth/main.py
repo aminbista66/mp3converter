@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends, Request, status
 from .config import load_env
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
@@ -42,6 +42,7 @@ def get_token(
 
     return {"access_token": token}
 
+
 @app.post("/verify-token")
 def verify_token(token: schemas.Token):
     data = verify_access_token(token.access_token)
@@ -69,3 +70,8 @@ def get_user_mail(req: Request, db: Session = Depends(get_db)):
 
     user = crud.get_user(db, data["sub"])
     return {"email": user.email} if user else {"detail": "User not found"}
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health():
+    return {"status": "ok"}
