@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, UploadFile, Request, File, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Annotated
-from .auth_svc import access
+from .auth_svc import access, user
 from fastapi.exceptions import HTTPException
 from .config import load_env
 from .utils import upload, download
@@ -68,6 +68,9 @@ def download_mp3(mp3_id: str):
         download.stream_file(mp3_id), media_type="audio/mpeg", headers=headers
     )
 
+@app.post("/create-user")
+def create_user(email: str, password: str):
+    return user.create(email, password)
 
 @app.get("/health", status_code=status.HTTP_200_OK)
 def health():
